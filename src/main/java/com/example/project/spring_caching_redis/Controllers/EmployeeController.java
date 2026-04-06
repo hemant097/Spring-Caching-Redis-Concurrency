@@ -19,7 +19,6 @@ public class EmployeeController {
 
     private final EmployeeService empService;
 
-
     //Path Variable, strictly mandatory
     @GetMapping(path = "/{empId}")
     public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long empId){

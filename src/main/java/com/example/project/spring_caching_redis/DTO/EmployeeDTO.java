@@ -1,21 +1,15 @@
 package com.example.project.spring_caching_redis.DTO;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class EmployeeDTO {
 
     private Long id;
 
     @NotBlank(message = "Name of the employee cannot be blank")
-    @Size(min=2, max=10, message="Name of the employee should have 2-10 characters")
+    @Size(min=2, max=30, message="Name of the employee should have 2-30 characters")
     private String name;
 
     @NotBlank(message = "Email cannot be blank")
@@ -28,7 +22,7 @@ public class EmployeeDTO {
     private Integer age;
 
 
-    @Pattern(regexp = "^(ANALYST|DEV)$")
+    @Pattern(regexp = "^(SDE|QA|HR|ADMIN|CTO|CEO|FINANCE)$")
     @NotBlank(message = "role of the employee cannot be blank")
     private String role;
 

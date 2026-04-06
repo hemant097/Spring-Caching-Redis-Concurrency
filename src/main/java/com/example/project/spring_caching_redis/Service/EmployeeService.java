@@ -7,6 +7,8 @@ import com.example.project.spring_caching_redis.Repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
@@ -23,8 +25,10 @@ public class EmployeeService {
 
     private final EmployeeRepository empRep;
     private final ModelMapper modelMapper;
+    private final String CACHE_NAME="employees";
 
-    @Cacheable(cacheNames = "employees", key = "{#empId}")
+
+    @Cacheable(cacheNames = CACHE_NAME, key = "{#empId}")
     public EmployeeDTO getEmployeeById(Long empId) {
 
         log.info("getting the employee with id:{}",empId);
@@ -45,8 +49,9 @@ public class EmployeeService {
                 .collect(Collectors.toList());
     }
 
+    @CachePut(cacheNames = CACHE_NAME, key = "{#result.id}")
     public EmployeeDTO createNewEmployee(EmployeeDTO inputEmployee) {
-        log.info("getting the employee with email:{}",inputEmployee.getEmail());
+        log.info("creating new employee with email:{}",inputEmployee.getEmail());
 
         EmployeeEntity toMapEmployee = modelMapper.map(inputEmployee, EmployeeEntity.class);
         EmployeeEntity savedEmployee = empRep.save(toMapEmployee);
@@ -54,12 +59,20 @@ public class EmployeeService {
         return modelMapper.map(savedEmployee,EmployeeDTO.class);
     }
 
+    @CachePut(cacheNames = CACHE_NAME, key = "{#empId}")
     public EmployeeDTO updateEmployeeById(EmployeeDTO employeeDTO, Long empId) {
 
-        whetherEmployeeExists(empId);
+        EmployeeEntity employee = empRep.findById(empId)
+                .orElseThrow(() -> {
+                    log.error("employee not found with id:{}", empId);
+                    return new ResourceNotFoundException("employee not found with id " + empId);
+                });
         log.info("updating the employee with id:{}",empId);
 
-        EmployeeEntity employee = modelMapper.map(employeeDTO,EmployeeEntity.class);
+        if(employeeDTO.getEmail().equals(employee.getEmail()))
+            throw new RuntimeException("The email of the employee cannot be updated");
+
+        modelMapper.map(employeeDTO,employee);
         employee.setId(empId);
         EmployeeEntity savedEmployeeEntity = empRep.save(employee);
         return modelMapper.map(savedEmployeeEntity,EmployeeDTO.class);
@@ -74,11 +87,13 @@ public class EmployeeService {
 
     }
 
+    @CacheEvict(cacheNames = CACHE_NAME, key = "{#empId}")
     public boolean deleteEmployeeById(Long empId) {
        whetherEmployeeExists(empId);
+        log.info("Deleting employee with ID:{}",empId);
 
-            empRep.deleteById(empId);
-            return true;
+        empRep.deleteById(empId);
+        return true;
 
     }
 

@@ -3,8 +3,10 @@ package com.example.project.spring_caching_redis.DTO;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Data
-public class EmployeeDTO {
+public class EmployeeDTO implements Serializable {
 
     private Long id;
 

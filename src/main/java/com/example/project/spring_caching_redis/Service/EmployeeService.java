@@ -1,7 +1,7 @@
 package com.example.project.spring_caching_redis.Service;
 
 import com.example.project.spring_caching_redis.DTO.EmployeeDTO;
-import com.example.project.spring_caching_redis.Entity.EmployeeEntity;
+import com.example.project.spring_caching_redis.Entity.Employee;
 import com.example.project.spring_caching_redis.Exceptions.ResourceNotFoundException;
 import com.example.project.spring_caching_redis.Repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ public class EmployeeService {
     public EmployeeDTO getEmployeeById(Long empId) {
 
         log.info("getting the employee with id:{}",empId);
-       EmployeeEntity employee =  empRep.findById(empId)
+       Employee employee =  empRep.findById(empId)
                .orElseThrow(() -> new ResourceNotFoundException("employee not found"));
 
        return modelMapper.map(employee,EmployeeDTO.class);
@@ -41,7 +41,7 @@ public class EmployeeService {
     public List<EmployeeDTO> getAllEmployees() {
         log.info("getting all the employees");
 
-        List<EmployeeEntity> employeeEntityList = empRep.findAll();
+        List<Employee> employeeEntityList = empRep.findAll();
 
         return employeeEntityList
                 .stream()
@@ -53,8 +53,8 @@ public class EmployeeService {
     public EmployeeDTO createNewEmployee(EmployeeDTO inputEmployee) {
         log.info("creating new employee with email:{}",inputEmployee.getEmail());
 
-        EmployeeEntity toMapEmployee = modelMapper.map(inputEmployee, EmployeeEntity.class);
-        EmployeeEntity savedEmployee = empRep.save(toMapEmployee);
+        Employee toMapEmployee = modelMapper.map(inputEmployee, Employee.class);
+        Employee savedEmployee = empRep.save(toMapEmployee);
 
         return modelMapper.map(savedEmployee,EmployeeDTO.class);
     }
@@ -62,7 +62,7 @@ public class EmployeeService {
     @CachePut(cacheNames = CACHE_NAME, key = "{#empId}")
     public EmployeeDTO updateEmployeeById(EmployeeDTO employeeDTO, Long empId) {
 
-        EmployeeEntity employee = empRep.findById(empId)
+        Employee employee = empRep.findById(empId)
                 .orElseThrow(() -> {
                     log.error("employee not found with id:{}", empId);
                     return new ResourceNotFoundException("employee not found with id " + empId);
@@ -74,7 +74,7 @@ public class EmployeeService {
 
         modelMapper.map(employeeDTO,employee);
         employee.setId(empId);
-        EmployeeEntity savedEmployeeEntity = empRep.save(employee);
+        Employee savedEmployeeEntity = empRep.save(employee);
         return modelMapper.map(savedEmployeeEntity,EmployeeDTO.class);
 
     }
@@ -100,10 +100,10 @@ public class EmployeeService {
     public EmployeeDTO updatePartialEmployee(Long empId, Map<String, Object> updates) {
         whetherEmployeeExists(empId);
         log.info("patching the employee with id:{}",empId);
-        EmployeeEntity employeeEntity = empRep.findById(empId).orElseThrow();
+        Employee employeeEntity = empRep.findById(empId).orElseThrow();
 
         updates.forEach((field,value)->{
-            Field fieldToBeUpdated = ReflectionUtils.findField(EmployeeEntity.class,field);
+            Field fieldToBeUpdated = ReflectionUtils.findField(Employee.class,field);
             fieldToBeUpdated.setAccessible(true);
             //modifying the field of employeeEntity using the fieldToBeUpdated, and value from updates
             ReflectionUtils.setField(fieldToBeUpdated,employeeEntity,value);

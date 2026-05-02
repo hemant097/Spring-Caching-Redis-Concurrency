@@ -3,26 +3,27 @@ package com.example.project.spring_caching_redis.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-
-@Entity
-@Table(name="employees")
 @Getter
 @Setter
+@Entity
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeEntity {
+@Table(name="employees")
+public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
 
     @Column(unique = true)
     private String email;
+    private String name;
+
     private Integer age;
-    private Double salary;
+
     private String role;
+    private Double salary;
 
 
 }

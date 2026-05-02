@@ -2,7 +2,9 @@ package com.example.project.spring_caching_redis.Controllers;
 
 
 import com.example.project.spring_caching_redis.DTO.EmployeeDTO;
+import com.example.project.spring_caching_redis.Entity.SalaryAccount;
 import com.example.project.spring_caching_redis.Service.EmployeeService;
+import com.example.project.spring_caching_redis.Service.SalaryAccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +20,7 @@ import java.util.Map;
 public class EmployeeController {
 
     private final EmployeeService empService;
+    private final SalaryAccountService salaryAccountService;
 
     //Path Variable, strictly mandatory
     @GetMapping(path = "/{empId}")
@@ -72,6 +75,18 @@ public class EmployeeController {
             return ResponseEntity.notFound().build();
         else
             return ResponseEntity.ok(employeeDTO);
+    }
+
+    @PostMapping("/{empId}/create")
+    public ResponseEntity<SalaryAccount> createSalaryAccount(@PathVariable Long empId){
+
+        return ResponseEntity.ok(salaryAccountService.createAccount(empId));
+    }
+
+    @PutMapping("/incrementBalance/{accountId}")
+    public ResponseEntity<SalaryAccount> incrementBalance(@PathVariable Long accountId) {
+        SalaryAccount salaryAccount = salaryAccountService.incrementBalance(accountId);
+        return ResponseEntity.ok(salaryAccount);
     }
 
 }

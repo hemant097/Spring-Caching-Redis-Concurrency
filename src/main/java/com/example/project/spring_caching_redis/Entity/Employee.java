@@ -25,5 +25,8 @@ public class Employee {
     private String role;
     private Double salary;
 
+    private String nationality;
+
+
 
 }

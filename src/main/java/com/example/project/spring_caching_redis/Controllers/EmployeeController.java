@@ -77,12 +77,6 @@ public class EmployeeController {
             return ResponseEntity.ok(employeeDTO);
     }
 
-    @PostMapping("/{empId}/create")
-    public ResponseEntity<SalaryAccount> createSalaryAccount(@PathVariable Long empId){
-
-        return ResponseEntity.ok(salaryAccountService.createAccount(empId));
-    }
-
     @PutMapping("/incrementBalance/{accountId}")
     public ResponseEntity<SalaryAccount> incrementBalance(@PathVariable Long accountId) {
         SalaryAccount salaryAccount = salaryAccountService.incrementBalance(accountId);

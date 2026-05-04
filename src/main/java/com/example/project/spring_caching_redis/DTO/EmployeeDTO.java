@@ -36,5 +36,7 @@ public class EmployeeDTO implements Serializable {
     @Positive(message = "salary can only be a positive number")
     private Double salary;
 
+    private String nationality;
+
 
 }

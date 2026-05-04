@@ -4,6 +4,7 @@ import com.example.project.spring_caching_redis.DTO.EmployeeDTO;
 import com.example.project.spring_caching_redis.Entity.Employee;
 import com.example.project.spring_caching_redis.Exceptions.ResourceNotFoundException;
 import com.example.project.spring_caching_redis.Repository.EmployeeRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -25,6 +26,7 @@ public class EmployeeService {
 
     private final EmployeeRepository empRep;
     private final ModelMapper modelMapper;
+    private final SalaryAccountService salaryAccountService;
     private final String CACHE_NAME="employees";
 
 
@@ -50,11 +52,27 @@ public class EmployeeService {
     }
 
     @CachePut(cacheNames = CACHE_NAME, key = "{#result.id}")
+    @Transactional
     public EmployeeDTO createNewEmployee(EmployeeDTO inputEmployee) {
         log.info("creating new employee with email:{}",inputEmployee.getEmail());
 
+        if(empRep.existsEmployeeByEmail(inputEmployee.getEmail())){
+            log.error("Employee already exist with email:{}",inputEmployee.getEmail());
+            throw new RuntimeException("Cannot add employee with this email again");
+        }
+
         Employee toMapEmployee = modelMapper.map(inputEmployee, Employee.class);
         Employee savedEmployee = empRep.save(toMapEmployee);
+
+    /*  without @Transactional, if createAccount throws an error, the Employee is saved in DB, but salary account isn't
+        created, which is an inconsistent state
+        Now if we do use this annotation, the employee is not saved till the entire method logic is completed without
+        any error. It wraps the method call with proxy logic. All the calls made on the particular bean's method would
+        actually first go to the proxy, because proxy is wrapped over the main bean.
+        The Transaction manager starts the transaction at the DB level. Internally @Transaction uses AOP, Before,After,etc.
+        Like when the method logic is executed gracefully. The After PointCut is called which then commits the transaction to the DB.
+    */
+        salaryAccountService.createAccount(savedEmployee);
 
         return modelMapper.map(savedEmployee,EmployeeDTO.class);
     }

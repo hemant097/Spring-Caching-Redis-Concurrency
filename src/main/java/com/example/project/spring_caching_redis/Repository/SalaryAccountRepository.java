@@ -9,7 +9,9 @@ import java.util.Optional;
 @Repository
 public interface SalaryAccountRepository extends JpaRepository<SalaryAccount, Long> {
 
-    @Override
+//    @Override
 //    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<SalaryAccount> findById(Long id);
 }
+
+

@@ -5,7 +5,6 @@ import com.example.project.spring_caching_redis.Entity.SalaryAccount;
 import com.example.project.spring_caching_redis.Repository.SalaryAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +33,8 @@ public class SalaryAccountService {
         salaryAccountRepository.save(salaryAccount);
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+//    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional
     public SalaryAccount incrementBalance(Long accountId) {
 
         SalaryAccount salaryAccount = salaryAccountRepository.findById(accountId)

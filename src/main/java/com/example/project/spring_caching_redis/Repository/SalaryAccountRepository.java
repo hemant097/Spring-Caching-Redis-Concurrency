@@ -1,7 +1,9 @@
 package com.example.project.spring_caching_redis.Repository;
 
 import com.example.project.spring_caching_redis.Entity.SalaryAccount;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -9,8 +11,8 @@ import java.util.Optional;
 @Repository
 public interface SalaryAccountRepository extends JpaRepository<SalaryAccount, Long> {
 
-//    @Override
-//    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Override
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<SalaryAccount> findById(Long id);
 }
 

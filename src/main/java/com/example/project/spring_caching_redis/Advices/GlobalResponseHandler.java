@@ -19,11 +19,13 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
 
     @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class<? extends HttpMessageConverter<?>> selectedConverterType,ServerHttpRequest request, ServerHttpResponse response) {
-        log.info(">>> beforeBodyWrite called with body {}",body.getClass().getName());
 
     //Oneliner Summary : ResponseEntity is consumed before ResponseBodyAdvice; only the body survives.
         if(body instanceof APIResponse<?>)
             return body;
+
+        if(body instanceof String str)
+            return str;
 
         if (body instanceof APIError error) {
             return new APIResponse<>(error);

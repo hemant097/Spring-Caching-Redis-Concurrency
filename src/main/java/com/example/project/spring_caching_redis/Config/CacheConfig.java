@@ -12,6 +12,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableCaching
@@ -28,8 +30,19 @@ public class CacheConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()))
                 ;
 
+        Map<String, RedisCacheConfiguration> configs = new HashMap<>();
+
+        //using this we can use different TTLs for methods
+        configs.put("new_employee_cache",
+                redisCacheConfiguration.entryTtl(Duration.ofMinutes(5)));
+
+        configs.put("weather_cache",
+                redisCacheConfiguration.entryTtl(Duration.ofMinutes(2)));
+
+
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)
+                .withInitialCacheConfigurations(configs)
                 .build();
     }
 }

@@ -2,9 +2,11 @@ package com.example.project.spring_caching_redis.Controllers;
 
 
 import com.example.project.spring_caching_redis.DTO.EmployeeDTO;
+import com.example.project.spring_caching_redis.Entity.ApiResponseDto;
 import com.example.project.spring_caching_redis.Entity.SalaryAccount;
 import com.example.project.spring_caching_redis.Service.EmployeeService;
 import com.example.project.spring_caching_redis.Service.SalaryAccountService;
+import com.example.project.spring_caching_redis.Service.WeatherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ public class EmployeeController {
 
     private final EmployeeService empService;
     private final SalaryAccountService salaryAccountService;
+    private final WeatherService weatherService;
 
     //Path Variable, strictly mandatory
     @GetMapping(path = "/{empId}")
@@ -81,6 +84,12 @@ public class EmployeeController {
     public ResponseEntity<SalaryAccount> incrementBalance(@PathVariable Long accountId) {
         SalaryAccount salaryAccount = salaryAccountService.incrementBalance(accountId);
         return ResponseEntity.ok(salaryAccount);
+    }
+
+    @GetMapping("/weather")
+    public ResponseEntity<ApiResponseDto> getWeatherOfACity(@RequestParam(defaultValue = "Kanpur") String city){
+
+        return ResponseEntity.ok(weatherService.getWeatherFromAPI(city));
     }
 
 }

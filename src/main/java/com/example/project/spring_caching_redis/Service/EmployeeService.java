@@ -51,7 +51,7 @@ public class EmployeeService {
                 .collect(Collectors.toList());
     }
 
-    @CachePut(cacheNames = CACHE_NAME, key = "{#result.id}")
+    @CachePut(cacheNames = "new_employee_cache", key = "{#result.id}")
     @Transactional
     public EmployeeDTO createNewEmployee(EmployeeDTO inputEmployee) {
         log.info("creating new employee with email:{}",inputEmployee.getEmail());

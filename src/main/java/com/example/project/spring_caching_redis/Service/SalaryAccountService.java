@@ -5,6 +5,7 @@ import com.example.project.spring_caching_redis.Entity.SalaryAccount;
 import com.example.project.spring_caching_redis.Repository.SalaryAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +42,7 @@ public class SalaryAccountService {
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
         BigDecimal prevBalance = salaryAccount.getBalance();
-        BigDecimal newBalance = prevBalance.add(BigDecimal.valueOf(1L));
-
-        salaryAccount.setBalance(newBalance);
+        salaryAccount.setBalance(prevBalance.add(BigDecimal.ONE));
 
         return salaryAccountRepository.save(salaryAccount);
     }
